@@ -34,7 +34,7 @@ class DQNAgent:
         self.gamma = 0.95          # discount rate
         self.epsilon = 1.0         # initial exploration rate
         self.epsilon_min = 0.1    # minimum possible epsilon value
-        self.epsilon_decay = 0.99   # decaying rate for epsilon
+        self.epsilon_decay = 0.999   # decaying rate for epsilon
         self.learning_rate = 1e-6
         self.model = self._build_model()
         self.util = Util()
@@ -197,7 +197,7 @@ if __name__=='__main__':
                                 action = agent.get_action(state, cur_bb, correct_bb, w, h)
                                 agent.update_action_history(action)
                                 new_bb, reward, done = env.step(action)
-                                print new_bb
+                                print image_id, new_bb
                                 cropped_image = raw_image[int(new_bb[1]):int(new_bb[3]), int(new_bb[0]):int(new_bb[2])]
                                 new_im_state = cv2.resize(cropped_image, (224, 224)).astype(np.float32)
                                 new_im_state = np.expand_dims(new_im_state, axis=0)

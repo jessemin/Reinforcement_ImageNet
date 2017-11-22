@@ -47,9 +47,9 @@ class Env:
             y_1 = 0.0
         if y_2 > self.h:
             y_2 = self.h
-        if x_1 > x_2:
+        if x_1 >= x_2:
             x_1 = x_2 - 10.0
-        if y_1 > y_2:
+        if y_1 >= y_2:
             y_1 = y_2 - 10.0
         self.current_bb = (x_1, y_1, x_2, y_2)
         return False
@@ -61,6 +61,8 @@ class Env:
         done = self.apply_action(action_type)
         iou_2 = self.util.computeIOU(self.current_bb, self.correct_bb)
         reward = 1.0 if iou_2-iou_1 > 0 else -1.0
+        if done:
+            reward = 3.0 if iou_1 >= 0.5 else -3.0
         return self.current_bb, reward, done
 
 
