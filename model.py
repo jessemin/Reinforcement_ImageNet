@@ -38,7 +38,7 @@ class DQNAgent:
         self.epsilon = 1.0         # initial exploration rate
         self.epsilon_min = 0.1    # minimum possible epsilon value
         self.epsilon_decay = 0.99   # decaying rate for epsilon
-        self.learning_rate = 1e-3
+        self.learning_rate = 5e-4
         self.model = self._build_model()
         self.util = Util()
         self.num_step = 0
@@ -67,10 +67,10 @@ class DQNAgent:
                        activation='linear',
                        kernel_initializer=initializers.VarianceScaling(scale=0.01))(x)
         model = Model(inputs=[image_model.input, history_input], output=output)
+        # model.compile(loss='mse',
+        #               optimizer=Adam(lr=1e-6, clipnorm=1.0))
         model.compile(loss='mse',
-                      optimizer=Adam(lr=1e-6, clipnorm=1.0))
-        #model.compile(loss='mse',
-        #              optimizer=SGD(lr=self.learning_rate, clipnorm=0.5))
+                     optimizer=SGD(lr=self.learning_rate, clipnorm=0.5))
         return model
 
     def reset_action_history(self):
@@ -219,7 +219,7 @@ if __name__=='__main__':
                                     t_reward_num += 1
                                     # if agent.epsilon > agent.epsilon_min:
                                     #     agent.epsilon *= agent.epsilon_decay
-                                print image_id, new_bb, t_reward_num, agent.learning_rate
+                                print image_id, new_bb, t_reward_num, global_step
                                 cropped_image = raw_image[int(new_bb[1]):int(new_bb[3]), int(new_bb[0]):int(new_bb[2])]
                                 new_im_state = cv2.resize(cropped_image, (224, 224)).astype(np.float64)
                                 new_im_state = np.expand_dims(new_im_state, axis=0)
