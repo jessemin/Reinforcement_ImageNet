@@ -9,7 +9,7 @@ from keras.applications.vgg16 import VGG16
 from keras.preprocessing import image
 from keras.applications.vgg16 import preprocess_input
 from keras.layers import Dense, Activation, concatenate, Dropout, Input, Flatten, Reshape
-from keras.optimizers import Adam
+from keras.optimizers import Adam, SGD
 from keras import backend as K
 from keras import initializers
 # import Python libs
@@ -66,8 +66,10 @@ class DQNAgent:
                        kernel_initializer=initializers.VarianceScaling(scale=0.01),
                        )(x)
         model = Model(inputs=[image_model.input, history_input], output=output)
+        # model.compile(loss='mse',
+        #               optimizer=Adam(lr=self.learning_rate, clipnorm=1.0))
         model.compile(loss='mse',
-                      optimizer=Adam(lr=self.learning_rate, clipnorm=1.0))
+                      optimizer=SGD(clipnorm=1.0))
         return model
 
     def reset_action_history(self):
