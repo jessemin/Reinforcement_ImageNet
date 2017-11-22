@@ -25,7 +25,7 @@ from sklearn.model_selection import train_test_split
 
 # Deep Q-learning Agent
 class DQNAgent:
-    def __init__(self, state_size=4096, action_size=9, action_history_size=4, batch_size=64):
+    def __init__(self, state_size=4096, action_size=9, action_history_size=4, batch_size=32):
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
@@ -70,7 +70,7 @@ class DQNAgent:
         # model.compile(loss='mse',
         #               optimizer=Adam(lr=self.learning_rate, clipnorm=1.0))
         model.compile(loss='mse',
-                      optimizer=SGD(lr=self.learning_rate, clipnorm=1.0))
+                      optimizer=SGD(lr=self.learning_rate, clipnorm=0.5))
         return model
 
     def reset_action_history(self):
