@@ -47,6 +47,10 @@ class Env:
             y_1 = 0.0
         if y_2 > self.h:
             y_2 = self.h
+        if x_1 > x_2:
+            x_1 = x_2 - 10.0
+        if y_1 > y_2:
+            y_1 = y_2 - 10.0
         self.current_bb = (x_1, y_1, x_2, y_2)
         return False
 

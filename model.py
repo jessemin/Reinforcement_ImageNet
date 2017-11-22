@@ -122,17 +122,17 @@ class DQNAgent:
         return answer
 
     # state is (o, h)
-    def get_action(self, state, correct_bb, w, h):
+    def get_action(self, state, current_bb, correct_bb, w, h):
         if np.random.rand() <= self.epsilon:
             positive = []
             for i in range(9):
-                if self.util.computeIOU(self.simulate_action(state, i, w, h), correct_bb) > 0.5:
+                if self.util.computeIOU(self.simulate_action(current_bb, i, w, h), correct_bb) > 0.5:
                     positive.append(i)
             if len(positive) == 0:
                 return Action(random.randrange(self.action_size))
             while True:
                 random_action = random.choice(positive)
-                if self.util.computeIOU(self.simulate_action(state, random_action, w, h), correct_bb) < 0.5:
+                if self.util.computeIOU(self.simulate_action(current_bb, random_action, w, h), correct_bb) < 0.5:
                     continue
                 return Action(random_action)
         act_values = self.model.predict(state)
@@ -194,7 +194,7 @@ if __name__=='__main__':
                             print image_id, correct_bb
                             while True:
                                 agent.num_step += 1
-                                action = agent.get_action(cur_bb, correct_bb, w, h)
+                                action = agent.get_action(state, cur_bb, correct_bb, w, h)
                                 agent.update_action_history(action)
                                 new_bb, reward, done = env.step(action)
                                 cropped_image = raw_image[int(new_bb[1]):int(new_bb[3]), int(new_bb[0]):int(new_bb[2])]
