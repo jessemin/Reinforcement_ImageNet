@@ -11,6 +11,7 @@ from keras.applications.vgg16 import preprocess_input
 from keras.layers import Dense, Activation, concatenate, Dropout, Input, Flatten, Reshape
 from keras.optimizers import Adam
 from keras import backend as K
+from keras import initializers
 # import Python libs
 import numpy as np
 import os
@@ -35,7 +36,7 @@ class DQNAgent:
         self.epsilon = 1.0         # initial exploration rate
         self.epsilon_min = 0.1    # minimum possible epsilon value
         self.epsilon_decay = 0.99   # decaying rate for epsilon
-        self.learning_rate = 0.001
+        self.learning_rate = 1e-6
         self.model = self._build_model()
         self.util = Util()
         self.num_step = 0
@@ -52,21 +53,21 @@ class DQNAgent:
         # 2) DQN with dropouts
         x = Dense(1024,
                   activation='relu',
-                  kernel_initializer='glorot_normal',
+                  kernel_initializer=initializers.VarianceScaling(scale=0.01),
                   bias_initializer='zeros')(x)
         x = Dropout(0.2)(x)
         x = Dense(1024,
                   activation='relu',
-                  kernel_initializer='glorot_normal',
+                  kernel_initializer=initializers.VarianceScaling(scale=0.01),
                   bias_initializer='zeros')(x)
         x = Dropout(0.2)(x)
         output = Dense(self.action_size,
                        activation='linear',
-                       kernel_initializer='glorot_normal')(x)
+                       kernel_initializer=initializers.VarianceScaling(scale=0.01),
+                       )(x)
         model = Model(inputs=[image_model.input, history_input], output=output)
         model.compile(loss='mse',
-                      optimizer=Adam(lr=self.learning_rate,
-                                     clipnorm=1.0))
+                      optimizer=Adam(lr=self.learning_rate))
         return model
 
     def reset_action_history(self):
