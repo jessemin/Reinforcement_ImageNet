@@ -197,6 +197,7 @@ if __name__=='__main__':
                                 action = agent.get_action(state, cur_bb, correct_bb, w, h)
                                 agent.update_action_history(action)
                                 new_bb, reward, done = env.step(action)
+                                print new_bb
                                 cropped_image = raw_image[int(new_bb[1]):int(new_bb[3]), int(new_bb[0]):int(new_bb[2])]
                                 new_im_state = cv2.resize(cropped_image, (224, 224)).astype(np.float32)
                                 new_im_state = np.expand_dims(new_im_state, axis=0)
