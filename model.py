@@ -19,6 +19,8 @@ from collections import deque
 import sys
 import cv2
 import random
+import pickle
+from sklearn.model_selection import train_test_split
 
 
 # Deep Q-learning Agent
@@ -63,8 +65,7 @@ class DQNAgent:
         x = Dropout(0.2)(x)
         output = Dense(self.action_size,
                        activation='linear',
-                       kernel_initializer=initializers.VarianceScaling(scale=0.01),
-                       )(x)
+                       kernel_initializer=initializers.VarianceScaling(scale=0.01))(x)
         model = Model(inputs=[image_model.input, history_input], output=output)
         # model.compile(loss='mse',
         #               optimizer=Adam(lr=self.learning_rate, clipnorm=1.0))
@@ -177,7 +178,19 @@ if __name__=='__main__':
                 bbCollector = BBCollector(wnid)
                 bbs = bbCollector.allBBs
                 if os.path.isdir(image_dir):
-                    images = os.listdir(image_dir)
+                    all_images = os.listdir(image_dir)
+                    # split into 90% for train and 10% for test
+                    images, images_test = train_test_split(all_images,
+                                                           test_size=0.1)
+                    pickle.dump(images,
+                                open(os.path.join("Models/",
+                                                  "train_list_"+str(wnid)+".p"),
+                                                  "wb"))
+                    pickle.dump(images_test,
+                                open(os.path.join("Models/",
+                                                  "test_list_"+str(wnid)+".p"),
+                                                  "wb"))
+                    print "Total Images for wnid: {}, Train Images: {}, Test Images: {}".format(len(all_images), len(images), len(images_test))
                     for episode_index in range(num_episodes):
                         print "Episode: ", episode_index
                         for img in images:
