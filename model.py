@@ -67,7 +67,7 @@ class DQNAgent:
                        )(x)
         model = Model(inputs=[image_model.input, history_input], output=output)
         model.compile(loss='mse',
-                      optimizer=Adam(lr=self.learning_rate))
+                      optimizer=Adam(lr=self.learning_rate, clipnorm=1.0))
         return model
 
     def reset_action_history(self):
@@ -214,7 +214,6 @@ if __name__=='__main__':
                                 state, cur_bb = new_state, new_bb
                                 if done:
                                     break
-                                print len(agent.memory)
                                 if len(agent.memory) >= agent.batch_size:
                                     agent.replay()
                         model.save("model_"+str(episode_index)+".h5")
