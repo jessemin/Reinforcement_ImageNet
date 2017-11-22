@@ -227,7 +227,7 @@ if __name__=='__main__':
                                 new_state = [new_im_state, agent.get_history_matrix()]
                                 agent.remember(state, action.get_action_type(), reward, new_state, done)
                                 state, cur_bb = new_state, new_bb
-                                if len(agent.memory) >= agent.batch_size and global_step % 10 == 0:
+                                if len(agent.memory) >= agent.batch_size and global_step % 100 == 0:
                                     agent.model.save(os.path.join("Models", "model_"+str(episode_index)+"_"+str(global_step)+".h5"))
                                 if done:
                                     break
