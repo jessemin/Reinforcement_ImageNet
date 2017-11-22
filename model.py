@@ -215,7 +215,7 @@ if __name__=='__main__':
                                 action = agent.get_action(state, cur_bb, correct_bb, w, h)
                                 agent.update_action_history(action)
                                 new_bb, reward, done = env.step(action)
-                                if reward == 3.0:
+                                if reward == 1.0:
                                     t_reward_num += 1
                                     # if agent.epsilon > agent.epsilon_min:
                                     #     agent.epsilon *= agent.epsilon_decay

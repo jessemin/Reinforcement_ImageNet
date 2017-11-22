@@ -60,9 +60,9 @@ class Env:
         iou_1 = self.util.computeIOU(self.current_bb, self.correct_bb)
         done = self.apply_action(action_type)
         iou_2 = self.util.computeIOU(self.current_bb, self.correct_bb)
-        reward = 1.0 if iou_2-iou_1 > 0 else -1.0
+        reward = 0.33 if iou_2-iou_1 > 0 else -0.33
         if done:
-            reward = 3.0 if iou_1 >= 0.5 else -3.0
+            reward = 1.0 if iou_1 >= 0.55 else -1.0
         return self.current_bb, reward, done
 
 
