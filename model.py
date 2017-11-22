@@ -165,6 +165,7 @@ if __name__=='__main__':
 
     # 3) run episodes
     num_episodes = 1000000
+    t_reward_num = 0
     for i in range(num_episodes):
         with open('annotation_list.dat', 'r') as f:
             for _wnid in f:
@@ -197,7 +198,9 @@ if __name__=='__main__':
                                 action = agent.get_action(state, cur_bb, correct_bb, w, h)
                                 agent.update_action_history(action)
                                 new_bb, reward, done = env.step(action)
-                                print image_id, new_bb
+                                if reward == 3.0:
+                                    t_reward_num += 1
+                                print image_id, new_bb, t_reward_num
                                 cropped_image = raw_image[int(new_bb[1]):int(new_bb[3]), int(new_bb[0]):int(new_bb[2])]
                                 new_im_state = cv2.resize(cropped_image, (224, 224)).astype(np.float32)
                                 new_im_state = np.expand_dims(new_im_state, axis=0)
@@ -209,5 +212,4 @@ if __name__=='__main__':
                                     break
                                 if len(agent.memory) >= agent.batch_size:
                                     agent.replay()
-                        if episode_index == 10:
-                            model.save("model_"+str(episode_index)+".h5")
+                        model.save("model_"+str(episode_index)+".h5")
