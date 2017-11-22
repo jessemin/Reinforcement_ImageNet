@@ -3,3 +3,5 @@
 *.pyc
 Annotation/
 Images/
+Models/
+*.h5

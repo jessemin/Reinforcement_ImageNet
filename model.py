@@ -166,7 +166,6 @@ if __name__=='__main__':
     agent = DQNAgent()
     # 2) print model summary
     print agent.model.summary()
-
     # 3) run episodes
     num_episodes = 1000000
     t_reward_num = 0
@@ -218,4 +217,4 @@ if __name__=='__main__':
                                     break
                                 if len(agent.memory) >= agent.batch_size:
                                     agent.replay()
-                        model.save("model_"+str(episode_index)+".h5")
+                        agent.model.save(os.path.join("Models", "model_"+str(episode_index)+".h5"))
