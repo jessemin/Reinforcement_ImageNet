@@ -25,7 +25,7 @@ from sklearn.model_selection import train_test_split
 
 # Deep Q-learning Agent
 class DQNAgent:
-    def __init__(self, state_size=4096, action_size=9, action_history_size=4, batch_size=32):
+    def __init__(self, state_size=4096, action_size=9, action_history_size=4, batch_size=64):
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
@@ -181,7 +181,7 @@ if __name__=='__main__':
                     all_images = os.listdir(image_dir)
                     # split into 90% for train and 10% for test
                     images, images_test = train_test_split(all_images,
-                                                           test_size=0.1)
+                                                           test_size=0.2)
                     pickle.dump(images,
                                 open(os.path.join("Models/",
                                                   "train_list_"+str(wnid)+".p"),
