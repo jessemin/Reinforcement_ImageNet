@@ -69,7 +69,7 @@ class DQNAgent:
         # model.compile(loss='mse',
         #               optimizer=Adam(lr=self.learning_rate, clipnorm=1.0))
         model.compile(loss='mse',
-                      optimizer=SGD(clipnorm=1.0))
+                      optimizer=SGD(lr=self.learning_rate, clipnorm=1.0))
         return model
 
     def reset_action_history(self):
