@@ -25,7 +25,7 @@ from sklearn.model_selection import train_test_split
 
 # Deep Q-learning Agent
 class DQNAgent:
-    def __init__(self, state_size=4096, action_size=9, action_history_size=4, batch_size=32):
+    def __init__(self, state_size=4096, action_size=9, action_history_size=4, batch_size=100):
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
@@ -67,10 +67,10 @@ class DQNAgent:
                        activation='linear',
                        kernel_initializer=initializers.VarianceScaling(scale=0.01))(x)
         model = Model(inputs=[image_model.input, history_input], output=output)
-        # model.compile(loss='mse',
-        #               optimizer=Adam(lr=self.learning_rate, clipnorm=1.0))
         model.compile(loss='mse',
-                      optimizer=SGD(lr=self.learning_rate, clipnorm=0.5))
+                      optimizer=Adam(lr=1e-6, clipnorm=1.0))
+        #model.compile(loss='mse',
+        #              optimizer=SGD(lr=self.learning_rate, clipnorm=0.5))
         return model
 
     def reset_action_history(self):
@@ -178,6 +178,7 @@ if __name__=='__main__':
                 bbs = bbCollector.allBBs
                 if os.path.isdir(image_dir):
                     all_images = os.listdir(image_dir)
+                    global_step = 0
                     # split into 90% for train and 10% for test
                     images, images_test = train_test_split(all_images,
                                                            test_size=0.2)
@@ -202,13 +203,14 @@ if __name__=='__main__':
                             env = Env(wnid, image_id)
                             cur_bb = env.current_bb
                             correct_bb = tuple(bbs[image_id].bounding_boxes[0])
-                            im_state = cv2.resize(raw_image, (224, 224)).astype(np.float32)
+                            im_state = cv2.resize(raw_image, (224, 224)).astype(np.float64)
                             im_state = np.expand_dims(im_state, axis=0)
                             im_state = preprocess_input(im_state)
-                            state = [im_state, agent.get_history_matrix()]
                             agent.reset_action_history()
+                            state = [im_state, agent.get_history_matrix()]
                             print image_id, correct_bb
                             while True:
+                                global_step += 1
                                 agent.num_step += 1
                                 action = agent.get_action(state, cur_bb, correct_bb, w, h)
                                 agent.update_action_history(action)
@@ -219,7 +221,7 @@ if __name__=='__main__':
                                     #     agent.epsilon *= agent.epsilon_decay
                                 print image_id, new_bb, t_reward_num, agent.learning_rate
                                 cropped_image = raw_image[int(new_bb[1]):int(new_bb[3]), int(new_bb[0]):int(new_bb[2])]
-                                new_im_state = cv2.resize(cropped_image, (224, 224)).astype(np.float32)
+                                new_im_state = cv2.resize(cropped_image, (224, 224)).astype(np.float64)
                                 new_im_state = np.expand_dims(new_im_state, axis=0)
                                 new_im_state = preprocess_input(new_im_state)
                                 new_state = [new_im_state, agent.get_history_matrix()]
@@ -229,4 +231,6 @@ if __name__=='__main__':
                                     break
                                 if len(agent.memory) >= agent.batch_size:
                                     agent.replay()
+                                if global_step % 200 == 0:
+                                    agent.model.save(os.path.join("Models", "model_"+str(episode_index)+"_"+str(global_step)+".h5"))
                         agent.model.save(os.path.join("Models", "model_"+str(episode_index)+".h5"))

@@ -62,7 +62,7 @@ class Env:
         iou_2 = self.util.computeIOU(self.current_bb, self.correct_bb)
         reward = 1.0 if iou_2-iou_1 > 0 else -1.0
         if done:
-            reward = 3.0 if iou_1 >= 0.6 else -3.0
+            reward = 3.0 if iou_1 >= 0.5 else -3.0
         return self.current_bb, reward, done
 
 
