@@ -152,10 +152,9 @@ class DQNAgent:
             target_f = self.model.predict(state)
             target_f[0][action] = target
             self.model.fit(state, target_f, epochs=1)
-        # if self.epsilon > self.epsilon_min:
-        #     self.epsilon *= self.epsilon_decay
-            # # linear decay
-            #self.epsilon = self.epsilon - (self.epsilon-self.epsilon_min) * (self.num_step * 1.0 / 1000000)
+        # linear decay
+        if self.epsilon > self.epsilon_min:
+            self.epsilon = self.epsilon - (self.epsilon-self.epsilon_min) * (self.num_step * 1.0 / 1000000)
 
     def remember(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))
@@ -216,8 +215,8 @@ if __name__=='__main__':
                                 new_bb, reward, done = env.step(action)
                                 if reward == 3.0:
                                     t_reward_num += 1
-                                    if agent.epsilon > agent.epsilon_min:
-                                        agent.epsilon *= agent.epsilon_decay
+                                    # if agent.epsilon > agent.epsilon_min:
+                                    #     agent.epsilon *= agent.epsilon_decay
                                 print image_id, new_bb, t_reward_num, agent.learning_rate
                                 cropped_image = raw_image[int(new_bb[1]):int(new_bb[3]), int(new_bb[0]):int(new_bb[2])]
                                 new_im_state = cv2.resize(cropped_image, (224, 224)).astype(np.float32)
