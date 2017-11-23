@@ -28,8 +28,11 @@ if __name__=='__main__':
     # sample code for trainng
     # 1) create a DQNAgent
     agent = DQNAgent()
-    # 2) print model summary
-    agent.model = load_model(os.path.join("saved","model_2_5900.h5"))
+    # 2) load model and test set
+    agent.model = load_model(os.path.join("saved", "model_2_5900.h5"))
+    test_images = pickle.load(open("test_list_n00007846.p", "rb"))
+    wnid = 'n00007846'
+    print test_images[0]
     '''
     for i in range(num_episodes):
         with open('annotation_list.dat', 'r') as f:
