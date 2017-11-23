@@ -30,7 +30,8 @@ if __name__=='__main__':
     agent = DQNAgent()
     # 2) load model and test set
     agent.model = load_model(os.path.join("saved", "model_2_5900.h5"))
-    test_images = pickle.load(open("test_list_n00007846.p", "rb"))
+    print "Loaded the pre-trained model"
+    test_images = pickle.load(open(os.path.join("saved", "test_list_n00007846.p"), "rb"))
     wnid = 'n00007846'
     print test_images[0]
     '''
