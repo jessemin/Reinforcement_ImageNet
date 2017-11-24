@@ -3,7 +3,7 @@ from util import Util
 from bbdata import BBCollector
 from env import Env
 from action import Action
-from model import DQNAgent
+from model import DQNAgent, DDQNAgent
 # import keras
 from keras.models import Sequential, Model, load_model
 from keras.applications.vgg16 import VGG16
@@ -28,11 +28,13 @@ if __name__=='__main__':
     # sample code for trainng
     # 1) create a DQNAgent
     agent = DQNAgent()
+    #agent = DDQNAgent()
     #agent.epsilon = 0.1
     # 2) load model and test set
-    agent.model = load_model(os.path.join("saved", "model_2_5900.h5"))
+    #agent.model = load_model(os.path.join("saved", "model_2_5900.h5"))
+    agent.model = load_model(os.path.join("saved2", "model_3_6000.h5"))
     print "Finished loading the pre-trained model..."
-    test_images = pickle.load(open(os.path.join("saved", "test_list_n00007846.p"), "rb"))
+    test_images = pickle.load(open(os.path.join("saved", "train_list_n00007846.p"), "rb"))
     print "Finished loading the testing set..."
     wnid = 'n00007846'
     tot_cnt = 0

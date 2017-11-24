@@ -6,4 +6,5 @@ Images/
 Models/
 *.h5
 saved/
-results/
+results_ddqn_val/
+results_dqn_val/
