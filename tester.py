@@ -29,7 +29,7 @@ if __name__=='__main__':
     # 1) create a DQNAgent
     #agent = DQNAgent()
     agent = DDQNAgent()
-    #agent.epsilon = 0.1
+    #agent.epsilon = 0.0
     # 2) load model and test set
     #agent.model = load_model(os.path.join("saved", "model_2_5900.h5"))
     agent.model = load_model(os.path.join("saved2", "model_3_6000.h5"))
@@ -41,8 +41,8 @@ if __name__=='__main__':
     tot_iou = 0.0
     ious = []
     for img in test_images:
-        if img != "n00007846_25930.JPEG":
-            continue
+        #if img != "n00007846_25930.JPEG":
+        #    continue
         raw_image = cv2.imread(os.path.join("Images", wnid, img))
         h, w = [_*1.0 for _ in raw_image.shape[:2]]
         image_id = img[:img.find(".")]
