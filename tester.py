@@ -37,6 +37,7 @@ if __name__=='__main__':
     wnid = 'n00007846'
     tot_cnt = 0
     tot_iou = 0.0
+    ious = []
     for img in test_images:
         raw_image = cv2.imread(os.path.join("Images", wnid, img))
         h, w = [_*1.0 for _ in raw_image.shape[:2]]
@@ -69,12 +70,14 @@ if __name__=='__main__':
             print cur_bb, " ", correct_bb
 
             if done:
+                iou = agent.util.computeIOU(cur_bb, correct_bb)
                 tot_cnt += 1
                 tot_iou += iou
-                iou = agent.util.computeIOU(cur_bb, correct_bb)
+                ious.append(iou)
                 print cur_bb, " ", correct_bb, " ", image_id, iou
                 cv2.rectangle(raw_image, (int(cur_bb[0]), int(cur_bb[1])), (int(cur_bb[2]), int(cur_bb[3])), (0, 255, 0), 2)
                 cv2.imwrite(os.path.join("results", str(wnid) +"_"+ str(image_id) + "_" + str(iou) + ".png"), raw_image)
                 break
     print tot_iou, " ", tot_cnt
     print tot_iou * 1.0 / tot_cnt
+    pickle.dump(ious, open(os.path.join("results", "ious.p"), "wb"))
