@@ -28,7 +28,7 @@ if __name__=='__main__':
     # sample code for trainng
     # 1) create a DQNAgent
     agent = DQNAgent()
-    agent.epsilon = 0
+    #agent.epsilon = 0.1
     # 2) load model and test set
     agent.model = load_model(os.path.join("saved", "model_2_5900.h5"))
     print "Finished loading the pre-trained model..."
@@ -52,9 +52,8 @@ if __name__=='__main__':
         im_state = preprocess_input(im_state)
         agent.reset_action_history()
         state = [im_state, agent.get_history_matrix()]
+        print "starting... ", image_id
         while True:
-            global_step += 1
-            agent.num_step += 1
             action = agent.get_action(state, cur_bb, correct_bb, w, h)
             agent.update_action_history(action)
             new_bb, reward, done = env.step(action)
@@ -65,7 +64,11 @@ if __name__=='__main__':
             new_im_state = preprocess_input(new_im_state)
             new_state = [new_im_state, agent.get_history_matrix()]
             state, cur_bb = new_state, new_bb
+            print cur_bb, " ", correct_bb
 
             if done:
-                print cur_bb, " ", correct_bb, " ", image_id
+                iou = agent.util.computeIOU(cur_bb, correct_bb)
+                print cur_bb, " ", correct_bb, " ", image_id, iou
+                cv2.rectangle(raw_image, (int(cur_bb[0]), int(cur_bb[1])), (int(cur_bb[2]), int(cur_bb[3])), (0, 255, 0), 2)
+                cv2.imwrite(os.path.join("results", str(wnid) +"_"+ str(image_id) + "_" + str(iou) + ".png"), raw_image)
                 break
