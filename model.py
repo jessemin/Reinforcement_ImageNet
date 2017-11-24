@@ -160,10 +160,101 @@ class DQNAgent:
         self.memory.append((state, action, reward, next_state, done))
 
 
+class DDQNAgent(DQNAgent):
+    def __init__(self, state_size=4096, action_size=9, action_history_size=4, batch_size=100):
+        self.state_size = state_size
+        self.action_size = action_size
+        self.memory = deque(maxlen=2000)
+        self.action_history_size = action_history_size
+        self.action_history = deque(maxlen=self.action_history_size)
+        for _ in range(self.action_history_size):
+            self.action_history.append(-1)
+        self.batch_size = batch_size
+        self.gamma = 0.95          # discount rate
+        self.epsilon = 1.0         # initial exploration rate
+        self.epsilon_min = 0.1    # minimum possible epsilon value
+        self.epsilon_decay = 0.99   # decaying rate for epsilon
+        self.learning_rate = 5e-4
+        self.model = self._build_model()
+        self.model2 = self._build_model2()
+        self.util = Util()
+        self.num_step = 0
+
+    def _build_model2(self):
+        # 1) VGG16 for processing bb
+        # load VGG16 image_model (input size: (224, 224, 3), output size: 4096)
+        image_model = VGG16(weights='imagenet', include_top=True)
+        # 4 history action vectors (36,)
+        history_input = Input(shape=(self.action_history_size*self.action_size,),
+                              name='history_input2')
+        # concatenate history and output from vgg16 before applying softmax
+        x = concatenate([history_input, image_model.layers[-2].output])
+        # 2) DQN with dropouts
+        x = Dense(1024,
+                  activation='relu',
+                  kernel_initializer=initializers.VarianceScaling(scale=0.01),
+                  bias_initializer='zeros')(x)
+        x = Dropout(0.2)(x)
+        x = Dense(1024,
+                  activation='relu',
+                  kernel_initializer=initializers.VarianceScaling(scale=0.01),
+                  bias_initializer='zeros')(x)
+        x = Dropout(0.2)(x)
+        output = Dense(self.action_size,
+                       activation='linear',
+                       kernel_initializer=initializers.VarianceScaling(scale=0.01))(x)
+        model = Model(inputs=[image_model.input, history_input], output=output)
+        # model.compile(loss='mse',
+        #               optimizer=Adam(lr=1e-6, clipnorm=1.0))
+        model.compile(loss='mse',
+                     optimizer=SGD(lr=self.learning_rate, clipnorm=0.5))
+        return model
+
+    def replay(self):
+        minibatch = random.sample(self.memory, self.batch_size)
+        for state, action, reward, next_state, done in minibatch:
+            random_num = random.choice([0, 1])
+            if random_num == 0:
+                target = reward
+                if not done:
+                  target = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
+                target_f = self.model.predict(state)
+                target_f[0][action] = target
+                self.model2.fit(state, target_f, epochs=1)
+            if random_num == 1:
+                target = reward
+                if not done:
+                  target = reward + self.gamma * np.amax(self.model2.predict(next_state)[0])
+                target_f = self.model2.predict(state)
+                target_f[0][action] = target
+                self.model.fit(state, target_f, epochs=1)
+        # linear decay
+        if self.epsilon > self.epsilon_min:
+            self.epsilon = self.epsilon - (self.epsilon-self.epsilon_min) * (self.num_step * 1.0 / 1000000)
+
+    # state is (o, h)
+    def get_action(self, state, current_bb, correct_bb, w, h):
+        if np.random.rand() <= self.epsilon:
+            positive = []
+            for i in range(9):
+                if self.util.computeIOU(self.simulate_action(current_bb, i, w, h), correct_bb) > 0.5:
+                    positive.append(i)
+            if len(positive) == 0:
+                return Action(random.randrange(self.action_size))
+            while True:
+                random_action = random.choice(positive)
+                if self.util.computeIOU(self.simulate_action(current_bb, random_action, w, h), correct_bb) < 0.5:
+                    continue
+                return Action(random_action)
+        act_values = self.model.predict(state)
+        act_values2 = self.model2.predict(state)
+        return Action(np.argmax(act_values[0]+act_values2[0]))
+
+
 if __name__=='__main__':
     # sample code for trainng
     # 1) create a DQNAgent
-    agent = DQNAgent()
+    agent = DDQNAgent()
     # 2) print model summary
     print agent.model.summary()
     # 3) run episodes
