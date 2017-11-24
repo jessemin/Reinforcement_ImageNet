@@ -27,20 +27,22 @@ from sklearn.model_selection import train_test_split
 if __name__=='__main__':
     # sample code for trainng
     # 1) create a DQNAgent
-    agent = DQNAgent()
-    #agent = DDQNAgent()
+    #agent = DQNAgent()
+    agent = DDQNAgent()
     #agent.epsilon = 0.1
     # 2) load model and test set
     #agent.model = load_model(os.path.join("saved", "model_2_5900.h5"))
     agent.model = load_model(os.path.join("saved2", "model_3_6000.h5"))
     print "Finished loading the pre-trained model..."
-    test_images = pickle.load(open(os.path.join("saved", "train_list_n00007846.p"), "rb"))
+    test_images = pickle.load(open(os.path.join("saved", "test_list_n00007846.p"), "rb"))
     print "Finished loading the testing set..."
     wnid = 'n00007846'
     tot_cnt = 0
     tot_iou = 0.0
     ious = []
     for img in test_images:
+        if img != "n00007846_25930.JPEG":
+            continue
         raw_image = cv2.imread(os.path.join("Images", wnid, img))
         h, w = [_*1.0 for _ in raw_image.shape[:2]]
         image_id = img[:img.find(".")]

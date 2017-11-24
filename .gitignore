@@ -8,3 +8,6 @@ Models/
 saved/
 results_ddqn_val/
 results_dqn_val/
+results_ddqn_train/
+results_dqn_train/
+results/
